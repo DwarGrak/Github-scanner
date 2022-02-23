@@ -1,52 +1,79 @@
 import 'dotenv/config';
 import express from 'express';
 import { graphqlHTTP } from 'express-graphql';
-import { buildSchema } from 'graphql';
+import {
+  GraphQLBoolean,
+  GraphQLInt,
+  GraphQLList,
+  GraphQLNonNull,
+  GraphQLObjectType,
+  GraphQLSchema,
+  GraphQLString,
+} from 'graphql';
 import graphqlFields from 'graphql-fields';
 import { getRepo, getRepoList } from './controller.js';
 
-var schema = buildSchema(`
-  type RepoShort {
-    name: String
-    size: String
-    ownerName: String
-  }
-
-  type FileContent {
-    path: String
-    content: String
-  }
-
-  type Repo {
-    name: String
-    size: String
-    ownerName: String
-    isPrivate: Boolean
-    filesCount: Int
-    firstYML: FileContent
-    activeWebhooks: [String]
-  }
-
-  type Query {
-    repoList(ownerName: String!): [RepoShort!]
-    repo(ownerName: String!, repoName: String!, branchName: String): Repo!
-  }
-`);
-
-const root = {
-  repoList: getRepoList,
-  repo: (props, _, info) => {
-    const fields = graphqlFields(info);
-    return getRepo(props, fields);
+const RepoShort = new GraphQLObjectType({
+  name: 'RepoShort',
+  fields: {
+    name: { type: GraphQLString },
+    size: { type: GraphQLInt },
+    ownerName: { type: GraphQLString },
   },
-};
+});
+
+const FileContent = new GraphQLObjectType({
+  name: 'FileContent',
+  fields: {
+    path: { type: GraphQLString },
+    content: { type: GraphQLString },
+  },
+});
+
+const Repo = new GraphQLObjectType({
+  name: 'Repo',
+  fields: {
+    name: { type: GraphQLString },
+    size: { type: GraphQLInt },
+    ownerName: { type: GraphQLString },
+    isPrivate: { type: GraphQLBoolean },
+    filesCount: { type: GraphQLInt },
+    firstYML: { type: FileContent },
+    activeWebhooks: { type: new GraphQLList(GraphQLString) },
+  },
+});
+
+const Query = new GraphQLObjectType({
+  name: 'Query',
+  fields: {
+    getRepoList: {
+      type: new GraphQLList(RepoShort),
+      args: {
+        ownerName: { type: new GraphQLNonNull(GraphQLString) },
+      },
+      resolve: (_, args) => getRepoList(args),
+    },
+    getRepo: {
+      type: Repo,
+      args: {
+        ownerName: { type: new GraphQLNonNull(GraphQLString) },
+        repoName: { type: new GraphQLNonNull(GraphQLString) },
+        branchName: { type: GraphQLString },
+      },
+      resolve: (_, args, __, info) => getRepo(args, graphqlFields(info)),
+    },
+  },
+});
+
+const schema = new GraphQLSchema({
+  query: Query,
+});
 
 var app = express();
 app.use(
   '/graphql',
   graphqlHTTP({
     schema: schema,
-    rootValue: root,
     graphiql: true,
   })
 );
