@@ -1,5 +1,5 @@
 import express from 'express';
-import { getRepoList } from '../controller.js';
+import getRepoList from '../controller/getRepoList.js';
 
 const router = express.Router();
 

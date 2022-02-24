@@ -1,6 +1,6 @@
 import { GraphQLNonNull, GraphQLString } from 'graphql';
 import graphqlFields from 'graphql-fields';
-import { getRepo } from '../../controller.js';
+import getRepo from '../../controller/getRepo.js';
 import Repo from '../type/Repo.js';
 
 export default {

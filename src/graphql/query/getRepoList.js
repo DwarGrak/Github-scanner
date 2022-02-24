@@ -1,5 +1,5 @@
 import { GraphQLList, GraphQLNonNull, GraphQLString } from 'graphql';
-import { getRepoList } from '../../controller.js';
+import getRepoList from '../../controller/getRepoList.js';
 import RepoShort from '../type/RepoShort.js';
 
 export default {
