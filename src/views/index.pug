@@ -1,0 +1,14 @@
+html
+  head
+    title Github scanner
+  body
+    h1 Greetings in Github Scanner!
+    span Go to
+    a( href='/graphql')  GraphQl interface
+    |
+    span  or choose an
+    b  ownerName
+    span !
+    form(action='/list', method='GET')
+      input(type='text', name='ownerName', value='')
+      input(type='submit', value='Submit')

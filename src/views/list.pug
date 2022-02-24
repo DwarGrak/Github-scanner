@@ -1,0 +1,21 @@
+html
+  head
+    title Github scanner
+  body
+    span Go back to
+    a( href='/')  Main page
+    |
+    if error
+        p(font-size: 18) Error found:
+            strong= error
+    else
+        table
+            tr
+                th Name
+                th Size
+                th OwnerName
+            each repo in list
+                tr
+                    td= repo.name
+                    td= repo.size
+                    td= repo.ownerName
